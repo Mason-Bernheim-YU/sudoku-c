@@ -8,35 +8,71 @@ int board_coordinates_in_range(int row, int column) {
 }
 
 SudokuBoard *board_create(void) {
-    /* STUDENT TODO 1: Implement the complete board constructor. */
-    return NULL;
+    SudokuBoard *board;
+    board = malloc(sizeof(*board));
+    if (board == NULL) {
+        return NULL;
+    }
+    board->cells = calloc(SUDOKU_CELL_COUNT, sizeof(*board->cells));
+    if (board->cells == NULL) {
+        free(board);
+        return NULL;
+    }
+
+    return board;
 }
 
 SudokuBoard *board_clone(const SudokuBoard *source) {
-    /* STUDENT TODO 3: Return a separate board with independent cell storage. */
-    (void)source;
-    return NULL;
+    SudokuBoard *copy;
+
+    if (source == NULL || source->cells == NULL) {
+        return NULL;
+    }
+    copy = board_create();
+    if (copy == NULL) {
+        return NULL;
+    }
+
+    if (!board_copy(copy, source)) {
+        board_destroy(&copy);
+        return NULL;
+    }
+
+    return copy;
 }
 
 void board_destroy(SudokuBoard **board_ptr) {
-    /* STUDENT TODO 1: Release a board and clear the caller's pointer. */
-    (void)board_ptr;
+    SudokuBoard *board;
+
+    if (board_ptr == NULL || *board_ptr == NULL) {
+        return;
+    }
+
+    board = *board_ptr;
+
+    free(board->cells);
+    board->cells = NULL;
+    free(board);
+
+    *board_ptr = NULL;
 }
 
 int *board_cell(SudokuBoard *board, int row, int column) {
-    /* STUDENT TODO 2: Return the mutable cell pointer for this coordinate. */
-    (void)board;
-    (void)row;
-    (void)column;
-    return NULL;
+    if (board == NULL || board->cells == NULL ||
+        !board_coordinates_in_range(row, column)) {
+        return NULL;
+    }
+
+    return board->cells + (size_t)row * SUDOKU_SIZE + (size_t)column;
 }
 
 const int *board_cell_const(const SudokuBoard *board, int row, int column) {
-    /* STUDENT TODO 2: Return the read-only cell pointer for this coordinate. */
-    (void)board;
-    (void)row;
-    (void)column;
-    return NULL;
+    if (board == NULL || board->cells == NULL ||
+        !board_coordinates_in_range(row, column)) {
+        return NULL;
+    }
+
+    return board->cells + (size_t)row * SUDOKU_SIZE + (size_t)column;
 }
 
 void board_clear(SudokuBoard *board) {
